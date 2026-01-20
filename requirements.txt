@@ -1,0 +1,9 @@
+azure-ai-documentintelligence
+azure-core
+openai
+langchain
+langchain-openai
+streamlit
+python-dotenv
+pillow
+pandas
