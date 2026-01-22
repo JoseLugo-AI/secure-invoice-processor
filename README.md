@@ -36,33 +36,6 @@ This project focuses on the **Confidentiality** and **Integrity** of financial r
 
 ---
 
-graph TD
-    subgraph Local_Secure_Perimeter ["Local Environment (Secure)"]
-        A[Invoices PDF/JPG] --> B[Surgical Redaction Engine]
-        B --> C{PII Detected?}
-        C -->|Yes| D[PIL/Pillow: Apply Blackout Polygons]
-        C -->|No| E[Pass Through]
-        D --> F[Sanitized Image Buffer]
-        E --> F
-    end
-
-    subgraph Azure_Cloud ["Azure Cloud Services"]
-        F --> G[Azure AI Document Intelligence]
-        G --> H[Azure OpenAI: GPT-4o Audit]
-    end
-
-    subgraph Final_Audit_Output ["Final Audit Output"]
-        H --> I[XlsxWriter: Excel Audit Log]
-        H --> J[Redacted PDF/Image Export]
-    end
-
-    %% Styling
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style F fill:#dfd,stroke:#333,stroke-width:4px
-    style H fill:#ddf,stroke:#333,stroke-width:2px
-
----
-
 ## 🚀 Getting Started
 
 ### Prerequisites
