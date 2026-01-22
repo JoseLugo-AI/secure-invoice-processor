@@ -1,3 +1,19 @@
+# Ignore the Secret Keys
 .env
+
+# Ignore the Redacted Data (The Vault)
+redacted_outputs/
+invoices/
+
+# Ignore Python Cache and Virtual Environments
 __pycache__/
+*.pyc
+venv/
 .venv/
+
+# Ignore System Files
+.DS_Store
+Thumbs.db
+
+# Ignore Local Launcher
+run_secure_app.bat

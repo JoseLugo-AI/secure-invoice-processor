@@ -15,7 +15,7 @@ st.markdown("""
     .risk-high { color: #dc3545; font-size: 24px; font-weight: bold; }
     .audit-card { border: 1px solid #ddd; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
     </style>
-""", unsafe_allow_html=True) # FIXED: Changed 'index' to 'html'
+""", unsafe_allow_html=True) 
 
 st.title("🛡️ Secure Invoice Enterprise")
 st.caption(f"Batch Processing | EU/US Tax Compliant | System Date: {datetime.now().strftime('%d.%m.%Y')}")
@@ -35,11 +35,13 @@ if uploaded_files:
             
             col1, col2 = st.columns([1, 1.5])
             
-            # --- PHASE 1: EXTRACTION ---
+            # --- PHASE 1: EXTRACTION (UI MESSAGE DISAPPEARS WHEN DONE) ---
             with col1:
-                st.info("🔍 Extracting Data...")
                 try:
-                    data = extract_invoice_data(file_bytes)
+                    # The 'with' block makes the message vanish once data is ready
+                    with st.spinner("🔍 Extracting Data..."):
+                        data = extract_invoice_data(file_bytes)
+                    
                     st.success(f"**Vendor:** {data['vendor']}")
                     st.write(f"**Total:** {data['total']}")
                     st.write(f"**VAT/Tax:** {data['tax']}")
@@ -49,45 +51,49 @@ if uploaded_files:
                     st.error(f"Extraction Error: {e}")
                     continue
 
-            # --- PHASE 2: SECURITY AUDIT ---
+            # --- PHASE 2: SECURITY AUDIT (UI MESSAGE DISAPPEARS WHEN DONE) ---
             with col2:
-                st.warning("🛡️ Performing Security Audit...")
-                try:
-                    report = security_audit(file_bytes, data, is_pdf=is_pdf)
-                    
-                    # Logic to find the Risk Score in the AI's text
-                    score = 0
-                    if "RISK_SCORE:" in report:
-                        try:
-                            # This looks for the text after "RISK_SCORE:", 
-                            # takes the first 10 characters, and keeps only the digits.
-                            raw_score_text = report.split("RISK_SCORE:")[1][:10]
-                            score_digits = "".join(filter(str.isdigit, raw_score_text))
-                            score = int(score_digits)
-                        except:
-                            score = 50 # Fallback if parsing fails
-                    
-                    # Display the Gauge
-                    if score < 30: 
-                        st.markdown(f"Risk Assessment: <span class='risk-low'>SAFE ({score}/100)</span>", unsafe_allow_html=True)
-                    elif score < 70: 
-                        st.markdown(f"Risk Assessment: <span class='risk-med'>CAUTION ({score}/100)</span>", unsafe_allow_html=True)
-                    else: 
-                        st.markdown(f"Risk Assessment: <span class='risk-high'>HIGH RISK ({score}/100)</span>", unsafe_allow_html=True)
-                    
-                    st.info(report)
-                    
-                    # Store data for Excel
-                    all_results.append({
-                        "Filename": uploaded_file.name,
-                        "Vendor": data['vendor'],
-                        "Total": data['total'],
-                        "Tax": data['tax'],
-                        "Date": data['date'],
-                        "Risk_Score": score
-                    })
-                except Exception as e:
-                    st.error(f"Audit Error: {e}")
+                report_key = f"report_{uploaded_file.name}"
+                if report_key not in st.session_state:
+                    try:
+                        # The spinner message will vanish once the audit is complete
+                        with st.spinner("🛡️ Performing Security Audit..."):
+                            report = security_audit(file_bytes, data, is_pdf=is_pdf, original_name=uploaded_file.name)
+                            st.session_state[report_key] = report
+                    except Exception as e:
+                        st.error(f"Audit Error: {e}")
+                        continue
+                
+                report = st.session_state[report_key]
+                
+                # SINGLE SOURCE OF TRUTH: Parse the score once
+                score = 0
+                if "RISK_SCORE:" in report:
+                    try:
+                        raw_score_text = report.split("RISK_SCORE:")[1][:10]
+                        score_digits = "".join(filter(str.isdigit, raw_score_text))
+                        score = int(score_digits)
+                    except:
+                        score = 50 
+                
+                # Display the Gauge
+                if score < 30: 
+                    st.markdown(f"Risk Assessment: <span class='risk-low'>SAFE ({score}/100)</span>", unsafe_allow_html=True)
+                elif score < 70: 
+                    st.markdown(f"Risk Assessment: <span class='risk-med'>CAUTION ({score}/100)</span>", unsafe_allow_html=True)
+                else: 
+                    st.markdown(f"Risk Assessment: <span class='risk-high'>HIGH RISK ({score}/100)</span>", unsafe_allow_html=True)
+                
+                st.info(report)
+                
+                all_results.append({
+                    "Filename": uploaded_file.name,
+                    "Vendor": data['vendor'],
+                    "Total": data['total'],
+                    "Tax": data['tax'],
+                    "Date": data['date'],
+                    "Risk_Score": score
+                })
             st.markdown("---")
 
     # --- EXCEL EXPORT ---
@@ -96,7 +102,6 @@ if uploaded_files:
         df = pd.DataFrame(all_results)
         
         output = io.BytesIO()
-        # Ensure you have run: pip install xlsxwriter
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
             df.to_excel(writer, index=False, sheet_name='Security_Audit')
         
