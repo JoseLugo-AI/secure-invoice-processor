@@ -1,73 +1,74 @@
-# 🛡️ Secure-Invoice-Enterprise: Surgical Redaction & Audit
-**An AI-powered Financial Auditor with Automated PII Protection using Azure AI & GPT-4o.**
+# Secure Invoice Processor: Surgical Redaction & Audit
+**Portfolio demo — Azure AI invoice audit with automated PII redaction and GPT-4o.**
 
-[![Status](https://img.shields.io/badge/Status-Production--Ready-success.svg)](#)
+[![Status](https://img.shields.io/badge/Status-Portfolio--Demo-lightgrey.svg)](#)
 [![Python](https://img.shields.io/badge/Python-3.14+-blue.svg)](#)
 [![Security](https://img.shields.io/badge/Privacy-Surgical--Redaction-red.svg)](#)
 
-## 📖 Overview
-The **Secure-Invoice-Enterprise** is a specialized financial auditing tool designed for high-compliance environments. It solves the "Double-Bind" of AI auditing: needing to send data to a Large Language Model (LLM) while legally prohibited from sharing Personal Identifiable Information (PII). 
+> **This is a portfolio / demo artifact, not a production product and not a client deployment.** It shows how I approach the "double-bind" of sending documents to an LLM while keeping personal data off the wire. My core offer is Microsoft 365 Copilot GDPR consulting: **[joselugo.de](https://joselugo.de)**.
 
-### Key Highlights:
-* **✂️ Surgical Redaction:** Automatically detects and blacks out Customer PII (Names/Addresses) using Azure AI Document Intelligence coordinates before the data ever hits the LLM.
-* **🕵️ Senior Auditor Persona:** Employs a hardened GPT-4o system prompt to validate VAT (Europe) and Sales Tax (USA) based on currency and address jurisdiction.
-* **📅 Chronology Logic:** Built-in safeguards to detect future-dated invoices and verify tax periods against the current system date.
-* **🔒 Data Sovereignty:** Leverages local image processing (PIL) to ensure that only "cleansed" images are transmitted to Azure OpenAI.
+## Overview
+**Secure Invoice Processor** (this GitHub repo; older notes called it "Secure-Invoice-Enterprise") is a demo financial-audit workflow. It redacts customer PII locally, then asks GPT-4o to check VAT (Europe) and sales tax (USA) from what remains.
 
----
+### Key Highlights
+* **Surgical Redaction:** Detects and blacks out customer PII (names/addresses) using Azure AI Document Intelligence coordinates before the image hits the LLM.
+* **Senior Auditor Persona:** A GPT-4o system prompt validates VAT (Europe) and sales tax (USA) from currency and address jurisdiction.
+* **Chronology Logic:** Flags future-dated invoices and checks tax periods against the system date.
+* **Data Sovereignty:** Local image processing (PIL) so only cleansed images are sent to Azure OpenAI.
 
-## ⚖️ Compliance & Governance Frameworks
-Built to satisfy the requirements of international tax authorities and privacy regulators.
+![Architecture diagram](./Secure-Invoice-Enterprise%20Surgical%20Redaction%20%26%20Audit%20Diagram.png)
 
-* **GDPR Article 32 (EU):** Implements "Privacy by Design" by redacting names and residential addresses of customers before cloud processing.
-* **GoBD (Germany):** Supports the principles for the proper management and storage of books, records, and documents in electronic form.
-* **US Sales Tax Nexus:** Logic determines if Sales Tax is applied correctly based on US-formatted addresses and currency.
-* **NIST AI RMF:** Aligns with trustworthy AI standards by providing verifiable risk scores (0-100) for every document processed.
+## Compliance & Governance Frameworks
+This demo is built around the following themes (not an audit opinion or a certification):
 
----
+* **GDPR Article 32 (EU):** Privacy by Design — names and residential addresses are redacted before cloud processing.
+* **GoBD (Germany):** Touches principles for proper electronic books and records.
+* **US Sales Tax Nexus:** Logic checks whether sales tax fits a US-formatted address and currency.
+* **NIST AI RMF:** Each document gets a verifiable risk score (0–100).
 
-## 🛡️ Security & Hardening (CISSP Mindset)
-This project focuses on the **Confidentiality** and **Integrity** of financial records:
+## Security & Hardening (CISSP Mindset)
+Focus is **confidentiality** and **integrity** of the demo audit path:
 
-* **Surgical Redaction:** Unlike standard "blurring," this engine uses pixel-perfect coordinate scaling to ensure zero PII leakage.
-* **In-Memory Handshake:** Image buffers are cleared after processing to prevent data persistence in application memory.
-* **Sanitized Export:** The Excel batch export uses a "Single Source of Truth" variable to ensure the risk score you see on screen is the one recorded in your audit logs.
-* **VBS Launcher:** Includes a hidden background launcher to run the Streamlit engine as a secure service without an exposed terminal.
+* **Surgical Redaction:** Coordinate scaling rather than blur, so redacted pixels stay unreadable.
+* **In-Memory Handshake:** Image buffers are cleared after processing.
+* **Sanitized Export:** Excel batch export uses a single source of truth for the on-screen risk score vs. the audit log.
+* **VBS Launcher:** Optional hidden launcher to start Streamlit without an exposed terminal (Windows).
 
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Python 3.14+
-- Azure AI Document Intelligence (Prebuilt-Invoice Model)
+- Azure AI Document Intelligence (Prebuilt-Invoice model)
 - Azure OpenAI (GPT-4o deployment)
-- [Poppler](https://poppler.freedesktop.org/) (Required for PDF rendering)
+- [Poppler](https://poppler.freedesktop.org/) (PDF rendering)
 
 ### Installation & Usage
 1. **Clone the repo:**
-   git clone https://github.com/JoseLugo-AI/secure-invoice-enterprise.git
-   cd secure-invoice-enterprise
+
+   ```bash
+   git clone https://github.com/JoseLugo-AI/secure-invoice-processor.git
+   cd secure-invoice-processor
+   ```
 
 2. **Install dependencies:**
+
+   ```bash
    pip install -r requirements.txt
+   ```
 
-3. **Configure Environment:** Create a .env file from the .env.example template and add your Azure credentials.
+3. **Configure environment:** Copy `.env.example` to `.env` and add your Azure credentials.
 
-4. **Launch Application:**
-   Run the run_secure_app.bat to launch the enterprise interface in standalone mode.
+4. **Launch (Windows):** Run `run_secure_app.bat` for the standalone Streamlit UI.
 
----
+   Or: `streamlit run app.py`
 
-## 📜 License & Contributions
+## License & Contributions
 * **License:** MIT License.
-* **Contributing:** Issues and Pull Requests are welcome for expanding tax jurisdiction logic or improving OCR accuracy.
+* **Contributing:** Issues and pull requests welcome for tax-jurisdiction logic or OCR accuracy.
 
----
+## Author
+**Jose Lugo** — Infrastructure Security Expert & AI Solutions Architect
 
-## 👨‍💻 Author
-**Jose Lugo** *Infrastructure Security Expert & AI Solutions Architect*
-
-A 12-year **U.S. Army Veteran** and **Senior Systems Administrator** specializing in **Cybersecurity (CISSP/Security+)**. Based in Germany, I bridge the gap between complex US-based security frameworks and European data privacy laws.
+A 12-year **U.S. Army Veteran** and **Senior Systems Administrator** specializing in **Cybersecurity (CISSP/Security+)**. Based in Germany. Core consulting offer: Microsoft 365 Copilot GDPR / DSGVO — [joselugo.de](https://joselugo.de).
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/jose-lugo-cissp-327045308/)
